@@ -4,10 +4,9 @@
 
 #include <stdio.h>
 #include <sys/time.h>
-#include <stdlib.h>
+#include <stdbool.h>
 
 /* function declaration */
-double GetTime(void);   // get current time from linux system 
 int NCoinGreedy(int D, int Ncoin, int* Coins);
 
 /* main function */
@@ -20,11 +19,11 @@ int main(void)
     int i, j;      // loop index
     double MinAveNum;
     int min_coin_3, min_coin_4;
-
+    
     for (D = 1; D < 100; D++) {
         AveNum = AveNum + NCoinGreedy(D, Ncoin, Coins);
     }
-    AveNum = AveNum / 99;
+    AveNum = AveNum / 99;  
     printf("For coin set {1, 5, 10, 50} the average is %.5lf\n", AveNum);
     // change 50 
     MinAveNum = 101; 
@@ -85,43 +84,25 @@ int main(void)
 }
 
 /* function implementation */
-// Getime: current time from linux
-double GetTime(void)
-{           
-    struct timeval tv;
-
-    gettimeofday(&tv, NULL);
-    return tv.tv_sec + 1e-6 * tv.tv_usec;
-}
-
 int NCoinGreedy(int D, int Ncoin, int* Coins)
 {
-    int diff[4];
     int i;      // loop index
-    int min = 101; 
-    int chosen_idx; 
     int num = 0;
-    // printf("%d: \n", D);
+    bool done; 
+
     while (D > 0) {
         // compute the difference between current number and 
         // each type of coins
-        for (i = 0; i < Ncoin; i++) {
-            diff[i] = D - Coins[i];
-        }
-        // Greedy select coin: find minimum but > 0
-        for (i = 0; i < Ncoin; i++) {
-            if (diff[i] < min && diff[i] >= 0) {
-                min = diff[i];      // update min
-                chosen_idx = i;
+        done = false;
+        i = Ncoin - 1;  // start from large to small coin
+        while (i >= 0 && done==false) {
+            if (D - Coins[i] >= 0) {
+                done = true;
+                D = D - Coins[i];
             }
-        }
-        // printf("%d ", Coins[chosen_idx]);
-        D = min;
+            i--;
+        }    
         num++;
     }
-    // printf("\n");
-    // printf("num %d\n", num);
-
     return num;
-
 }
