@@ -87,18 +87,17 @@ int main(void)
 int NCoinGreedy(int D, int Ncoin, int* Coins)
 {
     int i;      // loop index
-    int num = 0;
+    int num = 0;    // initialize num to 0
     bool done; 
 
+    // select the coin that smaller than D and closest to D
     while (D > 0) {
-        // compute the difference between current number and 
-        // each type of coins
         done = false;
-        i = Ncoin - 1;  // start from large to small coin
+        i = Ncoin - 1;  // start from the largest to smallest coin
         while (i >= 0 && done==false) {
             if (D - Coins[i] >= 0) {
                 done = true;
-                D = D - Coins[i];
+                D = D - Coins[i]; // update D after subtract current coin
             }
             i--;
         }    
