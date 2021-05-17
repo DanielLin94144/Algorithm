@@ -45,7 +45,7 @@ int main(void)
     }
     printf("Coin set {1, 5, 10, %d} has the minimum average of %.5lf\n", 
                                     min_coin_4, MinAveNum);
-    Coins[3] = 50;  // recover 50 to 4th coin
+    Coins[3] = 50;  // recover 50 dollar for 4th coin
 
     // change 10 to coin which ranges from 6 to 49 in 3th index
     MinAveNum = inf; 
