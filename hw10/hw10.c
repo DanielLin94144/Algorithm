@@ -23,6 +23,8 @@ int main(void)
     int Ncoin = 4;      // number of coin type
     int Coins[4] = {1, 5, 10, 50};  // coin value
     int D;      // [1, 99]
+    int D_low = 1;
+    int D_high = 99;
     double AveNum = 0;
     double MinAveNum;
     int i, j;      // loop index
@@ -32,11 +34,11 @@ int main(void)
     // Original coin set
     // Recursive DP
     t = GetTime();
-    for (D = 1; D < 100; D++) {
+    for (D = D_low; D <= D_high; D++) {
         AveNum = AveNum + NCoinDP_R(D, Ncoin, Coins);
     }
-    t = (GetTime() - t) / 99;
-    AveNum = AveNum / 99;  
+    t = (GetTime() - t) / D_high;
+    AveNum = AveNum / D_high;  
 
     printf("Original coin set:\n");
     printf("  DP recursive: {1, 5, 10, 50} average is %.5lf ", AveNum);
@@ -45,35 +47,35 @@ int main(void)
     // top-down DP
     t = GetTime();
     // initialize g[0:D]
-    g = (int*)malloc(100 * sizeof(int));
-    for (i = 0; i <= 100; i++) {
+    g = (int*)malloc((D_high + 1) * sizeof(int));
+    for (i = D_low; i <= D_high; i++) {
         g[i] = -inf;
     }
     AveNum = 0;
-    for (D = 1; D < 100; D++) {
+    for (D = D_low; D <= D_high; D++) {
         AveNum = AveNum + NCoinDP_TD(D, Ncoin, Coins);
     }
-    t = (GetTime() - t) / 99;
-    AveNum = AveNum / 99;  
+    t = (GetTime() - t) / D_high;
+    AveNum = AveNum / D_high;  
     printf("  DP top-down: {1, 5, 10, 50} average is %.5lf ", AveNum);
     printf("CPU time: %e sec\n", t);
 
     // bottom-up DP
     t = GetTime();
-    d = (int*)malloc(100 * sizeof(int));
-    for (i = 1; i <= 100; i++) {
+    d = (int*)malloc((D_high + 1) * sizeof(int));
+    for (i = D_low; i <= D_high; i++) {
         d[i] = inf;
     }
     AveNum = 0;
-    D = 99;
+    D = D_high;
     // only call once for bottom-up approach
     NCoinDP_BU(D, Ncoin, Coins);
-    for (i = 1; i < 100; i++) {
+    for (i = D_low; i <= D_high; i++) {
         // printf("%d %d\n", i, d[i]);
         AveNum += d[i];
     }
-    t = (GetTime() - t) / 99;
-    AveNum = AveNum / 99;  
+    t = (GetTime() - t) / D_high;
+    AveNum = AveNum / D_high;  
     printf("  DP bottom-up: {1, 5, 10, 50} average is %.5lf ", AveNum);
     printf("CPU time: %e sec\n", t);
 
@@ -238,7 +240,7 @@ void NCoinDP_BU(int D, int Ncoin, int Coins[])
     for (i = 2; i <= D; i++) {
         min = inf;
         n = Ncoin;
-        // while (n > 0) {
+        while (n > 0) {
             Cn = Coins[n - 1];
             for (Xn = 0; Xn <= i / Cn; Xn++) {
                 gn = Xn + d[i - Xn * Cn];
@@ -246,8 +248,8 @@ void NCoinDP_BU(int D, int Ncoin, int Coins[])
                     min = gn;
                 }
             }
-            // n--;
-        // }
+            n--;
+        }
         d[i] = min;
     }
 }
