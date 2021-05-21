@@ -38,11 +38,11 @@ int main(void)
     for (D = D_low; D <= D_high; D++) {
         AveNum = AveNum + NCoinDP_R(D, Ncoin, Coins);
     }
-    t = (GetTime() - t);
     AveNum = AveNum / D_high;  
+    t = (GetTime() - t);
     printf("Original coin set:\n");
     printf("  DP recursive: {1, 5, 10, 50} average is %.5lf ", AveNum);
-    printf("CPU time: %e sec\n", t);
+    printf("CPU time: %g sec\n", t);
 
     // top-down DP
     t = GetTime();
@@ -60,10 +60,10 @@ int main(void)
     for (D = D_low; D <= D_high; D++) {
         AveNum = AveNum + NCoinDP_TD(D, Ncoin, Coins);
     }
-    t = (GetTime() - t);
     AveNum = AveNum / D_high;  
+    t = (GetTime() - t);
     printf("  DP top-down: {1, 5, 10, 50} average is %.5lf ", AveNum);
-    printf("CPU time: %e sec\n", t);
+    printf("CPU time: %g sec\n", t);
 
     // bottom-up DP
     t = GetTime();
@@ -78,10 +78,10 @@ int main(void)
     for (i = D_low; i <= D_high; i++) {
         AveNum += d[i];
     }
-    t = (GetTime() - t);
     AveNum = AveNum / D_high;  
+    t = (GetTime() - t);
     printf("  DP bottom-up: {1, 5, 10, 50} average is %.5lf ", AveNum);
-    printf("CPU time: %e sec\n", t);
+    printf("CPU time: %g sec\n", t);
 
     // change 50 to coin which ranges from 11 to 99 in 4th index
     // Recursive DP
@@ -90,7 +90,6 @@ int main(void)
     for (i = 11; i <100; i++) {
         Coins[3] = i;
         AveNum = 0;
-        
         for (D = D_low; D <= D_high; D++) {
             AveNum = AveNum + NCoinDP_R(D, Ncoin, Coins);
         }        
@@ -104,13 +103,15 @@ int main(void)
     printf("Replacing $50:\n");
     printf("  DP recursive: {1, 5, 10, %d} average is %.5lf ", 
                                             min_coin_4, MinAveNum);
-    printf("CPU time: %e sec\n", t);
+    printf("CPU time: %g sec\n", t);
+
     // Top-down DP
     MinAveNum = inf; 
     t = GetTime();
     for (i = 11; i <100; i++) {
         Coins[3] = i;
         AveNum = 0;
+        // initalization of g[1:D][1:Ncoin]
         for (k = D_low; k <= D_high; k++) {
             for (j = 1; j <= Ncoin; j++) {
                 g[k][j] = -inf;
@@ -128,7 +129,7 @@ int main(void)
     t = (GetTime() - t);
     printf("  DP top-down: {1, 5, 10, %d} average is %.5lf ", 
                                             min_coin_4, MinAveNum);
-    printf("CPU time: %e sec\n", t);
+    printf("CPU time: %g sec\n", t);
 
     // bottom-up DP
     MinAveNum = inf; 
@@ -136,6 +137,7 @@ int main(void)
     for (i = 11; i <100; i++) {
         Coins[3] = i;
         AveNum = 0;
+        // initalization of d[1:D]
         for (k = 0; k <= D_high; k++) {
             d[k] = 0;
         }
@@ -154,7 +156,7 @@ int main(void)
     t = (GetTime() - t);
     printf("  DP bottom-up: {1, 5, 10, %d} average is %.5lf ", 
                                             min_coin_4, MinAveNum);
-    printf("CPU time: %e sec\n", t);
+    printf("CPU time: %g sec\n", t);
     Coins[3] = 50;   // recover $50 to Coins[3]
 
     // change $10 to coin which ranges from 6 to 49 in 3th index
@@ -177,7 +179,7 @@ int main(void)
     printf("Replacing $10:\n");
     printf("  DP recursive: {1, 5, %d, 50} average is %.5lf ", 
                                             min_coin_3, MinAveNum);
-    printf("CPU time: %e sec\n", t);
+    printf("CPU time: %g sec\n", t);
 
     // Top-down DP
     MinAveNum = inf; 
@@ -185,6 +187,7 @@ int main(void)
     for (i = 6; i < 50; i++) {
         Coins[2] = i;
         AveNum = 0;
+        // initalization of g[1:D][1:Ncoin]
         for (k = D_low; k <= D_high; k++) {
             for (j = 1; j <= Ncoin; j++) {
                 g[k][j] = -inf;
@@ -202,7 +205,7 @@ int main(void)
     t = (GetTime() - t);
     printf("  DP top-down: {1, 5, %d, 50} average is %.5lf ", 
                                             min_coin_3, MinAveNum);
-    printf("CPU time: %e sec\n", t);
+    printf("CPU time: %g sec\n", t);
 
     // bottom-up DP
     MinAveNum = inf; 
@@ -210,6 +213,7 @@ int main(void)
     for (i = 6; i < 50; i++) {
         Coins[2] = i;
         AveNum = 0;
+        // initalization of d[1:D]
         for (k = 0; k <= D_high; k++) {
             d[k] = 0;
         }
@@ -228,7 +232,7 @@ int main(void)
     t = (GetTime() - t);
     printf("  DP bottom-up: {1, 5, %d, 50} average is %.5lf ", 
                                             min_coin_3, MinAveNum);
-    printf("CPU time: %e sec\n", t);
+    printf("CPU time: %g sec\n", t);
 
     // change both 10 and 50 in 3rd and 4th index
     // 3rd coin ranges from 6 to 98
@@ -256,7 +260,7 @@ int main(void)
     printf("Replacing $10 and $50:\n");
     printf("  DP recursive: {1, 5, %d, %d} average is %.5lf ", 
                                 min_coin_3, min_coin_4, MinAveNum);
-    printf("CPU time: %e sec\n", t);
+    printf("CPU time: %g sec\n", t);
 
     // Top-down DP
     MinAveNum = inf; 
@@ -266,6 +270,7 @@ int main(void)
         for (j = i + 1; j < 100; j++) {
             Coins[3] = j;
             AveNum = 0;
+            // initalization of g[1:D][1:Ncoin]
             for (k = D_low; k <= D_high; k++) {
                 for (l = 1; l <= Ncoin; l++) {
                     g[k][l] = -inf;
@@ -285,7 +290,7 @@ int main(void)
     t = (GetTime() - t);
     printf("  DP top-down: {1, 5, %d, %d} average is %.5lf ", 
                                 min_coin_3, min_coin_4, MinAveNum);
-    printf("CPU time: %e sec\n", t);
+    printf("CPU time: %g sec\n", t);
 
     // bottom-up DP
     MinAveNum = inf; 
@@ -295,6 +300,7 @@ int main(void)
         for (j = i + 1; j < 100; j++) {
             Coins[3] = j;
             AveNum = 0;
+            // initalization of d[1:D]
             for (k = 0; k <= D_high; k++) {
                 d[k] = 0;
             }
@@ -315,7 +321,7 @@ int main(void)
     t = (GetTime() - t);
     printf("  DP bottom-up: {1, 5, %d, %d} average is %.5lf ", 
                                 min_coin_3, min_coin_4, MinAveNum);
-    printf("CPU time: %e sec\n", t);
+    printf("CPU time: %g sec\n", t);
 
     return 0;
 }
@@ -341,7 +347,7 @@ int NCoinDP_R(int D, int Ncoin, int Coins[])
     // termination condiction
     // use C1 to represent all remaining dollars
     if (Ncoin == 1) {
-        return D / Cn;
+        return D;
     }
     for (Xn = 0; Xn <= D / Cn; Xn++) {
         gn = Xn + NCoinDP_R(D - Xn * Cn, Ncoin - 1, Coins);
@@ -366,7 +372,7 @@ int NCoinDP_TD(int D, int Ncoin, int Coins[])
     // termination condiction
     // use C1 to represent all remaining dollars
     if (Ncoin == 1) {
-        return D / Cn;
+        return D;
     }
     for (Xn = 0; Xn <= D / Cn; Xn++) {
         gn = Xn + NCoinDP_TD(D - Xn * Cn, Ncoin - 1, Coins);
