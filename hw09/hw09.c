@@ -110,24 +110,20 @@ int NCoinGreedy(int D, int Ncoin, int* Coins)
 {
     int i;      // loop index
     int num = 0;    // initialize num to 0
-    bool done;   // whether is done
 
     // select the coin that smaller than D and closest to D
-    while (D > 0) {
-        done = false;
-        i = Ncoin - 1;  // start from the largest to smallest coin
-        while (i >= 0 && done==false) {
-            if (D - Coins[i] >= 0) {  // Coin[i] <= D
-                done = true;    // terminate the inner while loop
-                D = D - Coins[i]; // update D after subtract current coin
-            }
+    i = Ncoin - 1;  // start from the largest to smallest coin
+    while (i >= 0 && D > 0) {
+        if (D - Coins[i] >= 0) {  // Coin[i] <= D
+            D = D - Coins[i]; // update D after subtract current coin
+            num++;
+        }
+        else {
             i--;    // update to one-step smaller coin index
-        }    
-        num++;      // update num
-    }
+        }
+    }    
     return num;
 }
-
 // Getime: current time from linux
 double GetTime(void)
 {           

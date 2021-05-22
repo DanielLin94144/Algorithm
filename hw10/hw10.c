@@ -46,7 +46,7 @@ int main(void)
 
     // top-down DP
     t = GetTime();
-    // initialize g[0:D]
+    // initialize g
     g = (int**)malloc((D_high + 1) * sizeof(int*));
     for (i = 0; i <= D_high; i++) {
         g[i] = (int*)malloc((Ncoin + 1) * sizeof(int));
@@ -61,15 +61,15 @@ int main(void)
         AveNum = AveNum + NCoinDP_TD(D, Ncoin, Coins);
     }
     AveNum = AveNum / D_high;  
-    t = (GetTime() - t);
+    t = GetTime() - t;
     printf("  DP top-down: {1, 5, 10, 50} average is %.5lf ", AveNum);
     printf("CPU time: %g sec\n", t);
 
     // bottom-up DP
     t = GetTime();
-    d = (int*)malloc((D + 1) * sizeof(int));
+    d = (int*)malloc((D_high + 1) * sizeof(int));
     for (i = 0; i <= D_high; i++) {
-        d[i] = 0;
+        d[i] = i;
     }
     AveNum = 0;
     D = D_high;
@@ -99,7 +99,7 @@ int main(void)
             min_coin_4 = i;
         }
     }
-    t = (GetTime() - t);
+    t = GetTime() - t;
     printf("Replacing $50:\n");
     printf("  DP recursive: {1, 5, 10, %d} average is %.5lf ", 
                                             min_coin_4, MinAveNum);
@@ -126,7 +126,7 @@ int main(void)
             min_coin_4 = i;
         }
     }
-    t = (GetTime() - t);
+    t = GetTime() - t;
     printf("  DP top-down: {1, 5, 10, %d} average is %.5lf ", 
                                             min_coin_4, MinAveNum);
     printf("CPU time: %g sec\n", t);
@@ -139,7 +139,7 @@ int main(void)
         AveNum = 0;
         // initalization of d[1:D]
         for (k = 0; k <= D_high; k++) {
-            d[k] = 0;
+            d[k] = k;
         }
         D = D_high;
         // only call once for bottom-up approach
@@ -153,7 +153,7 @@ int main(void)
             min_coin_4 = i;
         }
     }
-    t = (GetTime() - t);
+    t = GetTime() - t;
     printf("  DP bottom-up: {1, 5, 10, %d} average is %.5lf ", 
                                             min_coin_4, MinAveNum);
     printf("CPU time: %g sec\n", t);
@@ -175,7 +175,7 @@ int main(void)
             min_coin_3 = i;
         }
     }
-    t = (GetTime() - t);
+    t = GetTime() - t;
     printf("Replacing $10:\n");
     printf("  DP recursive: {1, 5, %d, 50} average is %.5lf ", 
                                             min_coin_3, MinAveNum);
@@ -202,7 +202,7 @@ int main(void)
             min_coin_3 = i;
         }
     }
-    t = (GetTime() - t);
+    t = GetTime() - t;
     printf("  DP top-down: {1, 5, %d, 50} average is %.5lf ", 
                                             min_coin_3, MinAveNum);
     printf("CPU time: %g sec\n", t);
@@ -215,7 +215,7 @@ int main(void)
         AveNum = 0;
         // initalization of d[1:D]
         for (k = 0; k <= D_high; k++) {
-            d[k] = 0;
+            d[k] = k;
         }
         D = D_high;
         // only call once for bottom-up approach
@@ -229,7 +229,7 @@ int main(void)
             min_coin_3 = i;
         }
     }
-    t = (GetTime() - t);
+    t = GetTime() - t;
     printf("  DP bottom-up: {1, 5, %d, 50} average is %.5lf ", 
                                             min_coin_3, MinAveNum);
     printf("CPU time: %g sec\n", t);
@@ -256,7 +256,7 @@ int main(void)
             }
         }
     }
-    t = (GetTime() - t);
+    t = GetTime() - t;
     printf("Replacing $10 and $50:\n");
     printf("  DP recursive: {1, 5, %d, %d} average is %.5lf ", 
                                 min_coin_3, min_coin_4, MinAveNum);
@@ -287,7 +287,7 @@ int main(void)
             }
         }
     }
-    t = (GetTime() - t);
+    t = GetTime() - t;
     printf("  DP top-down: {1, 5, %d, %d} average is %.5lf ", 
                                 min_coin_3, min_coin_4, MinAveNum);
     printf("CPU time: %g sec\n", t);
@@ -302,7 +302,7 @@ int main(void)
             AveNum = 0;
             // initalization of d[1:D]
             for (k = 0; k <= D_high; k++) {
-                d[k] = 0;
+                d[k] = k;
             }
             D = D_high;
             // only call once for bottom-up approach
@@ -318,7 +318,7 @@ int main(void)
             }
         }
     }
-    t = (GetTime() - t);
+    t = GetTime() - t;
     printf("  DP bottom-up: {1, 5, %d, %d} average is %.5lf ", 
                                 min_coin_3, min_coin_4, MinAveNum);
     printf("CPU time: %g sec\n", t);
@@ -344,7 +344,7 @@ int NCoinDP_R(int D, int Ncoin, int Coins[])
     int Cn = Coins[Ncoin - 1];
     int gn;
 
-    // termination condiction
+    // termination condition
     // use C1 to represent all remaining dollars
     if (Ncoin == 1) {
         return D;
@@ -369,7 +369,7 @@ int NCoinDP_TD(int D, int Ncoin, int Coins[])
     if (g[D][Ncoin] > 0) {
         return g[D][Ncoin];
     }
-    // termination condiction
+    // termination condition
     // use C1 to represent all remaining dollars
     if (Ncoin == 1) {
         return D;
@@ -380,7 +380,7 @@ int NCoinDP_TD(int D, int Ncoin, int Coins[])
             min = gn;
         }
     }
-    g[D][Ncoin] = min;
+    g[D][Ncoin] = min;  // record min to g table 
     return min;
 }
 
@@ -392,9 +392,6 @@ void NCoinDP_BU(int D, int Ncoin, int Coins[])
     int gn, Cn, Xn;
     int n;
     
-    for (i = 1; i <= D; i++) {
-        d[i] = i;
-    }
     for (i = 2; i <= Ncoin; i++) {
         for (j = 1; j <= D; j++) {
             Cn = Coins[i - 1];
