@@ -30,7 +30,7 @@ int main(void)
     double MinAveNum;
     int i, j, k, l;      // loop index
     int min_coin_3, min_coin_4; // value of 3rd, 4th coin in Coins list
-    double t;
+    double t;    // CPU time 
 
     // Original coin set
     // Recursive DP
@@ -39,7 +39,7 @@ int main(void)
         AveNum = AveNum + NCoinDP_R(D, Ncoin, Coins);
     }
     AveNum = AveNum / D_high;  
-    t = (GetTime() - t);
+    t = GetTime() - t;
     printf("Original coin set:\n");
     printf("  DP recursive: {1, 5, 10, 50} average is %.5lf ", AveNum);
     printf("CPU time: %g sec\n", t);
