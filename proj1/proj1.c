@@ -14,6 +14,7 @@ int n = 10;             // number of coins
 int **d;
 int **d_choice;
 bool done_init; 
+bool done_call;
 /* function declaration */
 int CoinLeft(int A[], int low, int high); // selecting left coin
 int CoinRandom(int A[], int low, int high); // random selection
@@ -23,7 +24,6 @@ int DP_TD(int A[], int low, int high);
 int max(int v1, int v2);
 int min(int v1, int v2); 
 double compete(int FX1(), int FX2(), int A[], int c[]);
-double GetTime(void);   // get current time from linux system 
 
 /* main function */ 
 int main(void)
@@ -33,32 +33,20 @@ int main(void)
     int i;
     int j; 
     double win1_ratio; 
-    double t; 
-
-    d = (int**)malloc(n * sizeof(int*));
-    for (i = 0; i <= n; i++) {
-        d[i] = (int*)malloc(n * sizeof(int));
-    }
     
-    d_choice = (int**)malloc(n * sizeof(int*));
-    for (i = 0; i <= n; i++) {
-        d_choice[i] = (int*)malloc(n * sizeof(int));
-    }
     srand(time(0));
-
     // Question 1
     printf("Question 1\n");
     win1_ratio = compete(CoinLeft, CoinLeft, A, c);
     printf("  CoinLeft vs. CoinLeft: %g\n", win1_ratio);
-
     win1_ratio = compete(CoinLeft, CoinRandom, A, c);
     printf("  CoinLeft vs. CoinRandom: %g\n", win1_ratio);
-    
     win1_ratio = compete(CoinRandom, CoinLeft, A, c);
     printf("  CoinRandom vs. CoinLeft: %g\n", win1_ratio);
 
     // Question 2
     printf("Question 2\n");
+    // player 1: CoinLeft
     win1_ratio = compete(CoinLeft, CoinLeft, A, c);
     printf("  CoinLeft vs. CoinLeft: %g\n", win1_ratio);
     win1_ratio = compete(CoinLeft, CoinRandom, A, c);
@@ -67,7 +55,7 @@ int main(void)
     printf("  CoinLeft vs. CoinGreedy: %g\n", win1_ratio);
     win1_ratio = compete(CoinLeft, CoinDP, A, c);
     printf("  CoinLeft vs. CoinDP: %g\n", win1_ratio);
-
+    // player 1: CoinRandom
     win1_ratio = compete(CoinRandom, CoinLeft, A, c);
     printf("  CoinRandom vs. CoinLeft: %g\n", win1_ratio);
     win1_ratio = compete(CoinRandom, CoinRandom, A, c);
@@ -76,7 +64,7 @@ int main(void)
     printf("  CoinRandom vs. CoinGreedy: %g\n", win1_ratio);
     win1_ratio = compete(CoinRandom, CoinDP, A, c);
     printf("  CoinRandom vs. CoinDP: %g\n", win1_ratio);
-
+    // player 1: CoinGreedy
     win1_ratio = compete(CoinGreedy, CoinLeft, A, c);
     printf("  CoinGreedy vs. CoinLeft: %g\n", win1_ratio);
     win1_ratio = compete(CoinGreedy, CoinRandom, A, c);
@@ -85,7 +73,7 @@ int main(void)
     printf("  CoinGreedy vs. CoinGreedy: %g\n", win1_ratio);
     win1_ratio = compete(CoinGreedy, CoinDP, A, c);
     printf("  CoinGreedy vs. CoinDP: %g\n", win1_ratio);
-
+    // player 1: CoinDP
     win1_ratio = compete(CoinDP, CoinLeft, A, c);
     printf("  CoinDP vs. CoinLeft: %g\n", win1_ratio);
     win1_ratio = compete(CoinDP, CoinRandom, A, c);
@@ -94,8 +82,6 @@ int main(void)
     printf("  CoinDP vs. CoinGreedy: %g\n", win1_ratio);
     win1_ratio = compete(CoinDP, CoinDP, A, c);
     printf("  CoinDP vs. CoinDP: %g\n", win1_ratio);
-
-
 
     return 0; 
 }
@@ -113,7 +99,7 @@ int CoinRandom(int A[], int low, int high)
     if (rand() % 2 == 0) {
         return low; 
     }
-    else if (rand() % 2 == 1) {
+    else {
         return high;
     }
 }
@@ -151,9 +137,21 @@ int max(int v1, int v2)
 int CoinDP(int A[], int low, int high)
 {
     int i, j;
+    int len;
+    int choose_left, choose_right;
+    int Max; 
 
     if (!done_init) {
-        // printf("here\n");
+        // memory allocation of table d and d_choice
+        d = (int**)malloc(n * sizeof(int*));
+        for (i = 0; i <= n; i++) {
+            d[i] = (int*)malloc(n * sizeof(int));
+        }
+        d_choice = (int**)malloc(n * sizeof(int*));
+        for (i = 0; i <= n; i++) {
+            d_choice[i] = (int*)malloc(n * sizeof(int));
+        }
+        // initialization of table d and d_choice
         for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
                 d[i][j] = 0;
@@ -162,8 +160,41 @@ int CoinDP(int A[], int low, int high)
         }
         done_init = true;
     }
-
-    DP_TD(A, low, high);
+    // call DP_TD(A, low, high); or use below bottom-up approach (DP_BU) 
+    if (!done_call) {
+        // DP_TD(A, low, high);
+        // using bottom-up DP (DP_BU)
+        for (i = 0; i < n; i++) {
+            d[i][i] = A[i];
+            j = i + 1;
+            Max = max(A[i], A[j]);
+            if (Max == A[i]) {
+                d_choice[i][j] = -1;  // record to choose left
+            }
+            else {
+                d_choice[i][j] = 1;  // record to choose right 
+            }
+            d[i][j] = Max;
+        }
+        for (len = 2; len < n; len++) {
+            i = 0; 
+            for (j = len; j < n; j++) {
+                choose_left = A[i] + min(d[i + 2][j], d[i + 1][j - 1]);
+                choose_right = A[j] + min(d[i][j - 2], d[i + 1][j - 1]);
+                Max = max(choose_left, choose_right);     
+                if (Max == choose_left) {
+                    d_choice[i][j] = -1;  // record to choose left 
+                }
+                else {
+                    d_choice[i][j] = 1;  // record to choose right 
+                }
+                d[i][j] = Max; // record ans
+                i++;
+            }
+        }
+        done_call = true;
+    }
+    // return the picking coin decision by d_choice
     if (d_choice[low][high] == -1) {
         return low;
     }
@@ -178,22 +209,23 @@ int DP_TD(int A[], int low, int high)
     int choose_right;
     int Max; 
 
-    // if already recorded in table d
+    // if already recorded in table d, return to avoid redundent function call
     if (d[low][high] > 0) {
         return d[low][high];
     }
     if (high == low) {  // one coin left
-        d_choice[low][high] = 1;
+        d_choice[low][high] = 1;  
+        // record to choose right, but it is actually useless 
         d[low][high] = A[low];
         return A[low];
     }
     if (high - 1 == low) {  // remain two coins
         Max = max(A[low], A[high]);
         if (Max == A[low]) {
-            d_choice[low][high] = -1;
+            d_choice[low][high] = -1;  // record to choose left
         }
         else {
-            d_choice[low][high] = 1;
+            d_choice[low][high] = 1;  // record to choose right 
         }
         d[low][high] = Max;
         return Max;
@@ -204,10 +236,10 @@ int DP_TD(int A[], int low, int high)
                                 DP_TD(A, low + 1, high - 1));
     Max = max(choose_left, choose_right);     
     if (Max == choose_left) {
-        d_choice[low][high] = -1;
+        d_choice[low][high] = -1;  // record to choose left 
     }
     else {
-        d_choice[low][high] = 1;
+        d_choice[low][high] = 1;  // record to choose right 
     }
     d[low][high] = Max; // record ans
     return Max;
@@ -234,6 +266,7 @@ double compete(int FX1(), int FX2(), int A[], int c[])
         low = 0; 
         high = n - 1;
         done_init = false;
+        done_call = false;
         for (r = 1; r <= 5; r++) {
             // player 1 choose coin first 
             k1 = FX1(A, low, high);
@@ -268,10 +301,3 @@ double compete(int FX1(), int FX2(), int A[], int c[])
     return (double) win1 / ((double) win1 + (double) win2);
 }
 
-double GetTime(void)
-{           
-    struct timeval tv;
-
-    gettimeofday(&tv, NULL);
-    return tv.tv_sec + 1e-6 * tv.tv_usec;
-}
