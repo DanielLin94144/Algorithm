@@ -8,17 +8,17 @@
 #include <stdbool.h>
 
 /* global variable declaration */
-int m = 1;        // number of games played 
+int m = 1000000;        // number of games played 
 int n = 10;             // number of coins 
-int DP_choice;      // -1: choose low; 1: choose right
+// -1: choose low; 1: choose right
 int **d;
 int **d_choice;
+bool done_init; 
 /* function declaration */
 int CoinLeft(int A[], int low, int high); // selecting left coin
 int CoinRandom(int A[], int low, int high); // random selection
 int CoinGreedy(int A[], int low, int high); // greedy approach
 int CoinDP(int A[], int low, int high); // dynamic programming
-int DP_recursive(int A[], int low, int high); 
 int DP_TD(int A[], int low, int high); 
 int max(int v1, int v2);
 int min(int v1, int v2); 
@@ -47,57 +47,53 @@ int main(void)
     srand(time(0));
 
     // Question 1
-    // printf("Question 1\n");
-    // win1_ratio = compete(CoinLeft, CoinLeft, A, c);
-    // printf("  CoinLeft vs. CoinLeft: %g\n", win1_ratio);
+    printf("Question 1\n");
+    win1_ratio = compete(CoinLeft, CoinLeft, A, c);
+    printf("  CoinLeft vs. CoinLeft: %g\n", win1_ratio);
 
-    // win1_ratio = compete(CoinLeft, CoinRandom, A, c);
-    // printf("  CoinLeft vs. CoinRandom: %g\n", win1_ratio);
+    win1_ratio = compete(CoinLeft, CoinRandom, A, c);
+    printf("  CoinLeft vs. CoinRandom: %g\n", win1_ratio);
     
-    // win1_ratio = compete(CoinRandom, CoinLeft, A, c);
-    // printf("  CoinRandom vs. CoinLeft: %g\n", win1_ratio);
+    win1_ratio = compete(CoinRandom, CoinLeft, A, c);
+    printf("  CoinRandom vs. CoinLeft: %g\n", win1_ratio);
 
     // Question 2
-    // printf("Question 2\n");
-    // win1_ratio = compete(CoinLeft, CoinLeft, A, c);
-    // printf("  CoinLeft vs. CoinLeft: %g\n", win1_ratio);
-    // win1_ratio = compete(CoinLeft, CoinRandom, A, c);
-    // printf("  CoinLeft vs. CoinRandom: %g\n", win1_ratio);
-    // win1_ratio = compete(CoinLeft, CoinGreedy, A, c);
-    // printf("  CoinLeft vs. CoinGreedy: %g\n", win1_ratio);
-    // win1_ratio = compete(CoinLeft, CoinDP, A, c);
-    // printf("  CoinLeft vs. CoinDP: %g\n", win1_ratio);
+    printf("Question 2\n");
+    win1_ratio = compete(CoinLeft, CoinLeft, A, c);
+    printf("  CoinLeft vs. CoinLeft: %g\n", win1_ratio);
+    win1_ratio = compete(CoinLeft, CoinRandom, A, c);
+    printf("  CoinLeft vs. CoinRandom: %g\n", win1_ratio);
+    win1_ratio = compete(CoinLeft, CoinGreedy, A, c);
+    printf("  CoinLeft vs. CoinGreedy: %g\n", win1_ratio);
+    win1_ratio = compete(CoinLeft, CoinDP, A, c);
+    printf("  CoinLeft vs. CoinDP: %g\n", win1_ratio);
 
-    // win1_ratio = compete(CoinRandom, CoinLeft, A, c);
-    // printf("  CoinRandom vs. CoinLeft: %g\n", win1_ratio);
-    // win1_ratio = compete(CoinRandom, CoinRandom, A, c);
-    // printf("  CoinRandom vs. CoinRandom: %g\n", win1_ratio);
-    // win1_ratio = compete(CoinRandom, CoinGreedy, A, c);
-    // printf("  CoinRandom vs. CoinGreedy: %g\n", win1_ratio);
-    // win1_ratio = compete(CoinRandom, CoinDP, A, c);
-    // printf("  CoinRandom vs. CoinDP: %g\n", win1_ratio);
+    win1_ratio = compete(CoinRandom, CoinLeft, A, c);
+    printf("  CoinRandom vs. CoinLeft: %g\n", win1_ratio);
+    win1_ratio = compete(CoinRandom, CoinRandom, A, c);
+    printf("  CoinRandom vs. CoinRandom: %g\n", win1_ratio);
+    win1_ratio = compete(CoinRandom, CoinGreedy, A, c);
+    printf("  CoinRandom vs. CoinGreedy: %g\n", win1_ratio);
+    win1_ratio = compete(CoinRandom, CoinDP, A, c);
+    printf("  CoinRandom vs. CoinDP: %g\n", win1_ratio);
 
-    // win1_ratio = compete(CoinGreedy, CoinLeft, A, c);
-    // printf("  CoinGreedy vs. CoinLeft: %g\n", win1_ratio);
-    // win1_ratio = compete(CoinGreedy, CoinRandom, A, c);
-    // printf("  CoinGreedy vs. CoinRandom: %g\n", win1_ratio);
-    // win1_ratio = compete(CoinGreedy, CoinGreedy, A, c);
-    // printf("  CoinGreedy vs. CoinGreedy: %g\n", win1_ratio);
-    // win1_ratio = compete(CoinGreedy, CoinDP, A, c);
-    // printf("  CoinGreedy vs. CoinDP: %g\n", win1_ratio);
+    win1_ratio = compete(CoinGreedy, CoinLeft, A, c);
+    printf("  CoinGreedy vs. CoinLeft: %g\n", win1_ratio);
+    win1_ratio = compete(CoinGreedy, CoinRandom, A, c);
+    printf("  CoinGreedy vs. CoinRandom: %g\n", win1_ratio);
+    win1_ratio = compete(CoinGreedy, CoinGreedy, A, c);
+    printf("  CoinGreedy vs. CoinGreedy: %g\n", win1_ratio);
+    win1_ratio = compete(CoinGreedy, CoinDP, A, c);
+    printf("  CoinGreedy vs. CoinDP: %g\n", win1_ratio);
 
     win1_ratio = compete(CoinDP, CoinLeft, A, c);
     printf("  CoinDP vs. CoinLeft: %g\n", win1_ratio);
-    // win1_ratio = compete(CoinDP, CoinRandom, A, c);
-    // printf("  CoinDP vs. CoinRandom: %g\n", win1_ratio);
-    // win1_ratio = compete(CoinDP, CoinGreedy, A, c);
-    // printf("  CoinDP vs. CoinGreedy: %g\n", win1_ratio);
-    // win1_ratio = compete(CoinDP, CoinDP, A, c);
-    // printf("  CoinDP vs. CoinDP: %g\n", win1_ratio);
-
-
-
-
+    win1_ratio = compete(CoinDP, CoinRandom, A, c);
+    printf("  CoinDP vs. CoinRandom: %g\n", win1_ratio);
+    win1_ratio = compete(CoinDP, CoinGreedy, A, c);
+    printf("  CoinDP vs. CoinGreedy: %g\n", win1_ratio);
+    win1_ratio = compete(CoinDP, CoinDP, A, c);
+    printf("  CoinDP vs. CoinDP: %g\n", win1_ratio);
 
 
 
@@ -155,15 +151,18 @@ int max(int v1, int v2)
 int CoinDP(int A[], int low, int high)
 {
     int i, j;
-    if (high - low + 1 == n) {
+
+    if (!done_init) {
+        // printf("here\n");
         for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
                 d[i][j] = 0;
                 d_choice[i][j] = 0;
             }
         }
+        done_init = true;
     }
-    // DP_recursive(A, low, high);
+
     DP_TD(A, low, high);
     if (d_choice[low][high] == -1) {
         return low;
@@ -172,39 +171,6 @@ int CoinDP(int A[], int low, int high)
         return high;
     }
 }
-// int DP_recursive(int A[], int low, int high)
-// {
-//     int choose_left;
-//     int choose_right;
-//     int Max; 
-
-//     if (high == low) {  // one coin left
-//         DP_choice = -1;
-//         return A[low];
-//     }
-//     if (high - 1 == low) {  // remain two coins
-//         Max = max(A[low], A[high]);
-//         if (Max == A[low]) {
-//             DP_choice = -1;
-//         }
-//         else {
-//             DP_choice = 1;
-//         }
-//         return Max;
-//     }
-//     choose_left = A[low] + min(DP_recursive(A, low + 2, high), 
-//                                 DP_recursive(A, low + 1, high - 1));
-//     choose_right = A[high] + min(DP_recursive(A, low, high - 2), 
-//                                 DP_recursive(A, low + 1, high - 1));
-//     Max = max(choose_left, choose_right);     
-//     if (Max == choose_left) {
-//         DP_choice = -1;
-//     }
-//     else {
-//         DP_choice = 1;
-//     }
-//     return Max;
-// }
 
 int DP_TD(int A[], int low, int high)
 {
@@ -214,11 +180,11 @@ int DP_TD(int A[], int low, int high)
 
     // if already recorded in table d
     if (d[low][high] > 0) {
-        printf("here\n");
         return d[low][high];
     }
     if (high == low) {  // one coin left
-        d_choice[low][high] = -1;
+        d_choice[low][high] = 1;
+        d[low][high] = A[low];
         return A[low];
     }
     if (high - 1 == low) {  // remain two coins
@@ -229,6 +195,7 @@ int DP_TD(int A[], int low, int high)
         else {
             d_choice[low][high] = 1;
         }
+        d[low][high] = Max;
         return Max;
     }
     choose_left = A[low] + min(DP_TD(A, low + 2, high), 
@@ -266,6 +233,7 @@ double compete(int FX1(), int FX2(), int A[], int c[])
         sum2 = 0; 
         low = 0; 
         high = n - 1;
+        done_init = false;
         for (r = 1; r <= 5; r++) {
             // player 1 choose coin first 
             k1 = FX1(A, low, high);
