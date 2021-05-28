@@ -347,7 +347,7 @@ int NCoinDP_R(int D, int Ncoin, int Coins[])
     // termination condition
     // use C1 to represent all remaining dollars
     if (Ncoin == 1) {
-        return D;
+        return D / Cn;
     }
     for (Xn = 0; Xn <= D / Cn; Xn++) {
         gn = Xn + NCoinDP_R(D - Xn * Cn, Ncoin - 1, Coins);
@@ -372,7 +372,7 @@ int NCoinDP_TD(int D, int Ncoin, int Coins[])
     // termination condition
     // use C1 to represent all remaining dollars
     if (Ncoin == 1) {
-        return D;
+        return D / Cn;
     }
     for (Xn = 0; Xn <= D / Cn; Xn++) {
         gn = Xn + NCoinDP_TD(D - Xn * Cn, Ncoin - 1, Coins);
