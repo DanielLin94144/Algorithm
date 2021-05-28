@@ -21,6 +21,7 @@ int CoinRandom(int A[], int low, int high); // random selection
 int CoinGreedy(int A[], int low, int high); // greedy approach
 int CoinDP(int A[], int low, int high); // dynamic programming
 int DP_TD(int A[], int low, int high); 
+void DP_BU(int A[]); 
 int max(int v1, int v2);
 int min(int v1, int v2); 
 double compete(int FX1(), int FX2(), int A[], int c[]);
@@ -137,9 +138,6 @@ int max(int v1, int v2)
 int CoinDP(int A[], int low, int high)
 {
     int i, j;
-    int len;
-    int choose_left, choose_right;
-    int Max; 
 
     if (!done_init) {
         // memory allocation of table d and d_choice
@@ -160,38 +158,10 @@ int CoinDP(int A[], int low, int high)
         }
         done_init = true;
     }
-    // call DP_TD(A, low, high); or use below bottom-up approach (DP_BU) 
-    if (!done_call) {
+    // call DP_TD(A, low, high); or bottom-up approach (DP_BU) 
+    if (!done_call) {   // only call DP once 
         // DP_TD(A, low, high);
-        // using bottom-up DP (DP_BU)
-        for (i = 0; i < n; i++) {
-            d[i][i] = A[i];
-            j = i + 1;
-            Max = max(A[i], A[j]);
-            if (Max == A[i]) {
-                d_choice[i][j] = -1;  // record to choose left
-            }
-            else {
-                d_choice[i][j] = 1;  // record to choose right 
-            }
-            d[i][j] = Max;
-        }
-        for (len = 2; len < n; len++) {
-            i = 0; 
-            for (j = len; j < n; j++) {
-                choose_left = A[i] + min(d[i + 2][j], d[i + 1][j - 1]);
-                choose_right = A[j] + min(d[i][j - 2], d[i + 1][j - 1]);
-                Max = max(choose_left, choose_right);     
-                if (Max == choose_left) {
-                    d_choice[i][j] = -1;  // record to choose left 
-                }
-                else {
-                    d_choice[i][j] = 1;  // record to choose right 
-                }
-                d[i][j] = Max; // record ans
-                i++;
-            }
-        }
+        DP_BU(A);
         done_call = true;
     }
     // return the picking coin decision by d_choice
@@ -243,6 +213,44 @@ int DP_TD(int A[], int low, int high)
     }
     d[low][high] = Max; // record ans
     return Max;
+}
+
+void DP_BU(int A[]) 
+{
+    int i, j;
+    int len;
+    int choose_left, choose_right;
+    int Max; 
+
+    for (i = 0; i < n; i++) {  // initialization of bottom-up table 
+    d[i][i] = A[i];  // when i == j
+    // when i == j - 1
+    j = i + 1; 
+    Max = max(A[i], A[j]);
+    if (Max == A[i]) {
+        d_choice[i][j] = -1;  // record to choose left
+    }
+    else {
+        d_choice[i][j] = 1;  // record to choose right 
+    }
+    d[i][j] = Max;
+    }
+    for (len = 2; len < n; len++) {
+        i = 0; 
+        for (j = len; j < n; j++) {
+            choose_left = A[i] + min(d[i + 2][j], d[i + 1][j - 1]);
+            choose_right = A[j] + min(d[i][j - 2], d[i + 1][j - 1]);
+            Max = max(choose_left, choose_right);     
+            if (Max == choose_left) {
+                d_choice[i][j] = -1;  // record to choose left 
+            }
+            else {
+                d_choice[i][j] = 1;  // record to choose right 
+            }
+            d[i][j] = Max; // record ans
+            i++;  // low index i move toward right 
+        }
+    }
 }
 
 double compete(int FX1(), int FX2(), int A[], int c[])
