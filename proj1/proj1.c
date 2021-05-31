@@ -179,7 +179,7 @@ int DP_TD(int A[], int low, int high)
     int choose_right;
     int Max; 
 
-    // if already recorded in table d, return to avoid redundent function call
+    // if already recorded in table d, return to avoid redundant function call
     if (d[low][high] > 0) {
         return d[low][high];
     }
