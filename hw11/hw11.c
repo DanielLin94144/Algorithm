@@ -15,10 +15,10 @@ void HeapSort(double *p_div_w, int n);
 void Heapify(double *p_div_w, int i, int n);
 
 /* global variable declaration */
-int R = 500;  // repeatation
+int R = 1000;  // the number of repeatation
 int *w; // w[1:n] weight list of n items
 int *p; // p[1:n] profit list of n items
-double *p_div_w;
+double *p_div_w; // the CP value for sorting other list
 char **name;    // name[1:n][1:3] each row is name item
 int *x; // global solution of including items or not (0: not; 1: include)
 int *cx; // current solution of including items or not (0: not; 1: include)
@@ -31,41 +31,44 @@ int M;  // maximum loading weight
 int main(void)
 {
     double t;   // CPU running time 
+    double t_sort; 
     int i;  // loop index
     int W = 0;  // weight 
     int P = 0;  // profit
 
+    // read the first line from data file
     scanf("%d %d", &N, &M);
     // memory allocation
     w = (int*)malloc(N * sizeof(int));
     p = (int*)malloc(N * sizeof(int));
     p_div_w = (double*)malloc(N * sizeof(double));
     name = (char**)malloc(N * sizeof(char*));
-
-
     x = (int*)malloc(N * sizeof(int));
     cx = (int*)malloc(N * sizeof(int));
-    
     for (i = 0; i < N; i++) {
         name[i] = (char*)malloc(3 * sizeof(char));  // 2 char + 1 null char
     }
-    // readlines 
+    // readlines from input file
     for (i = 0; i < N; i++) {
         scanf("%s %d %d", name[i], &w[i], &p[i]);
-        p_div_w[i] = p[i] / w[i];
+        p_div_w[i] = (double)p[i] / (double)w[i];
     }
-    
+    // preprocess list to non-increasing order by HeapSort()
+    t_sort = GetTime();
     HeapSort(p_div_w, N);  
-
-
+    t_sort = GetTime() - t_sort;
+    // run experiments
     t = GetTime();
     for (i = 0; i < R; i++) {
+        fp = 0;
+        fw = 0;
         BKnap(0, 0, 0);
     }
     t = (GetTime() - t) / R;
-
     // print out the result 
     printf("Pick items:\n");
+    P = 0;
+    W = 0;
     for (i = 0; i < N; i++) {
         if (x[i] == 1) {
             W += w[i];
@@ -73,10 +76,9 @@ int main(void)
             printf("  %s %d %d\n", name[i], w[i], p[i]);
         }
     }
-    
     printf("N = %d, M = %d\n", N, M);
     printf("Weight = %d, Profits = %d\n", W, P);
-    printf("CPU time: %g sec\n", t);
+    printf("CPU time: %g sec\n", t + t_sort);
     
     return 0;
 }
@@ -112,15 +114,14 @@ void BKnap(int k, int cp, int cw)
         }
     }
     // not add kth item but use Bound function to check if keep traverse
-    
     if (Bound(cp, cw, k) >= fp) {
         cx[k] = 0;  // do not add kth item
         if (k < N - 1) {
             BKnap(k + 1, cp, cw);
         }
         else if (k == N - 1 && cp > fp) {
-            fp = cp + p[k];
-            fw = cw + w[k];
+            fp = cp;
+            fw = cw;
             // record solution to x 
             for (i = 0; i < N; i++) {
                 x[i] = cx[i];
@@ -148,6 +149,8 @@ double Bound(int cp, int cw, int k)
     return mp;
 }
 
+// HeapSort: 
+
 void HeapSort(double *p_div_w, int n)  
 {
     int i;      // loop index 
@@ -167,7 +170,6 @@ void HeapSort(double *p_div_w, int n)
         t2 = w[i]; w[i] = w[0]; w[0] = t2;
         t2 = p[i]; p[i] = p[0]; p[0] = t2;
         t3 = name[i]; name[i] = name[0]; name[0] = t3;
-
         Heapify(p_div_w, 0, i);  // maximun is already in A[n]
     }
 }
@@ -179,10 +181,10 @@ void HeapSort(double *p_div_w, int n)
 void Heapify(double *p_div_w, int i, int n)
 {
     int j;    // A[j] is the lchild
-    double t1;     // temp buffer to save A[i]
-    int t2; 
-    int t3; 
-    char *t4;
+    double t1;  // temp buffer for p_div_w[i]
+    int t2;     // temp buffer for w[i]
+    int t3;     // temp buffer for p[i]
+    char *t4;   // temp buffer for name[i]
     bool done;    // boolean expression to determine whether heapify is done
 
     // temporary save element i since A[i] would change in heapify process
@@ -213,10 +215,11 @@ void Heapify(double *p_div_w, int i, int n)
             w[(j - 1) / 2] = w[j];
             p[(j - 1) / 2] = p[j];
             name[(j - 1) / 2] = name[j];
-            j = j * 2 + 1;
+            j = j * 2 + 1;  // update child index
         }
     }
-    p_div_w[(j - 1) / 2] = t1;   // temp finds right position
+    // temp finds right position
+    p_div_w[(j - 1) / 2] = t1;   
     w[(j - 1) / 2] = t2; 
     p[(j - 1) / 2] = t3; 
     name[(j - 1) / 2] = t4; 
