@@ -9,10 +9,10 @@
 
 /* function declaration */
 double GetTime(void);   // get current time from linux system 
-void BKnap(int k, int cp, int cw);
-double Bound(int cp, int cw, int k);
-void HeapSort(double *p_div_w, int n);  
-void Heapify(double *p_div_w, int i, int n);
+void BKnap(int k, int cp, int cw);  // backtracking method 
+double Bound(int cp, int cw, int k);  // upper bound function 
+void HeapSort(double *p_div_w, int n); // sort to non-increasing list by p/w
+void Heapify(double *p_div_w, int i, int n); // heapify to minheap property
 
 /* global variable declaration */
 int R = 1000;  // the number of repeatation
@@ -31,7 +31,7 @@ int M;  // maximum loading weight
 int main(void)
 {
     double t;   // CPU running time 
-    double t_sort; 
+    double t_sort; // HeapSort time 
     int i;  // loop index
     int W = 0;  // weight 
     int P = 0;  // profit
@@ -48,10 +48,14 @@ int main(void)
     for (i = 0; i < N; i++) {
         name[i] = (char*)malloc(3 * sizeof(char));  // 2 char + 1 null char
     }
+    // initialize x[1:n]
+    for (i = 0; i < N; i++) {
+        x[i] = 0;
+    }
     // readlines from input file
     for (i = 0; i < N; i++) {
         scanf("%s %d %d", name[i], &w[i], &p[i]);
-        p_div_w[i] = (double)p[i] / (double)w[i];
+        p_div_w[i] = (double)p[i] / (double)w[i]; // calculate p / w
     }
     // preprocess list to non-increasing order by HeapSort()
     t_sort = GetTime();
@@ -62,15 +66,16 @@ int main(void)
     for (i = 0; i < R; i++) {
         fp = 0;
         fw = 0;
-        BKnap(0, 0, 0);
+        BKnap(0, 0, 0);  // back tracking method to solve 0/1 knapsack
     }
     t = (GetTime() - t) / R;
     // print out the result 
     printf("Pick items:\n");
     P = 0;
     W = 0;
+    // do summation for solution x[1:n]
     for (i = 0; i < N; i++) {
-        if (x[i] == 1) {
+        if (x[i] == 1) { // if ith item is included
             W += w[i];
             P += p[i];
             printf("  %s %d %d\n", name[i], w[i], p[i]);
@@ -93,6 +98,11 @@ double GetTime(void)
     return tv.tv_sec + 1e-6 * tv.tv_usec;
 }
 
+// BKnap: backtracking algorithm
+// Input: cp: current profit, cw: current weight, fp: global maximum profit,
+// fw: weight of fp, k: current index, w[1:n]: weight array ,
+//  p[1:n]: profit array, k: the current index in 1 to N
+// Output: x[1:n]: the solution (only contain 0 or 1, 0: not pick; 1: pick)
 void BKnap(int k, int cp, int cw)
 {
     int i; // loop index 
@@ -130,6 +140,9 @@ void BKnap(int k, int cp, int cw)
     }
 }
 // Bound: estimate the maximum profit given current k, profit and weight
+// Input: cp: current profit, cw: current weight, k: current index, 
+// w[1:n]: weight array , p[1:n]: profit array
+// Output: Upper bound profit of k+1-th to n-th item given cw
 double Bound(int cp, int cw, int k) 
 {
     // initialize maximum profit and maximum weight to cp and cw
@@ -149,14 +162,17 @@ double Bound(int cp, int cw, int k)
     return mp;
 }
 
-// HeapSort: 
-
+// HeapSort: heapsort list to non-increasing list by p_div_w
+// Input: p_div_w[1:n] : array in value p/w, n: is the number of element,
+// w[1:n], p[1:n], name[1:n][3]
+// Output: sorted p_div_w[1:n], w[1:n], p[1:n], name[1:n][3]
 void HeapSort(double *p_div_w, int n)  
 {
     int i;      // loop index 
-    double t1;      // temp variable
-    int t2; 
-    char *t3;
+    double t1;  // temp buffer for p_div_w[i]
+    int t2;     // temp buffer for w[i]
+    int t3;     // temp buffer for p[i]
+    char *t4;   // temp buffer for name[i]
 
     // initialize A[1:n] to min heap
     for (i = (n - 1) / 2; i >= 0; i--) {
@@ -168,16 +184,17 @@ void HeapSort(double *p_div_w, int n)
     for (i = n - 1; i > 0; i--) {
         t1 = p_div_w[i]; p_div_w[i] = p_div_w[0]; p_div_w[0] = t1;
         t2 = w[i]; w[i] = w[0]; w[0] = t2;
-        t2 = p[i]; p[i] = p[0]; p[0] = t2;
-        t3 = name[i]; name[i] = name[0]; name[0] = t3;
+        t3 = p[i]; p[i] = p[0]; p[0] = t3;
+        t4 = name[i]; name[i] = name[0]; name[0] = t4;
         Heapify(p_div_w, 0, i);  // maximun is already in A[n]
     }
 }
 
-// Heapify: i is the element that needs to be rearrange 
-// to suit the maxheap property
-// NOTE: in C implementation, array starts from 0 to n-1
-// so the child index is 2 * i + 1 and i is 0 needs to be handle
+// Heapify: make ith element follows minheap property 
+// Input: p_div_w[1:n] : array in value p/w, i : the element that needs 
+// to be rearrange to suit the minheap property, 
+// n: is the number of element to be sorted, w[1:n],p[1:n],name[1:n][3]
+// Output: heapified p_div_w[1:n],w[1:n],p[1:n],name[1:n][3]
 void Heapify(double *p_div_w, int i, int n)
 {
     int j;    // A[j] is the lchild
