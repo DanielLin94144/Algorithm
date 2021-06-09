@@ -10,13 +10,13 @@
 /* Structure declaration */
 struct node 
 {
-    int cost, lb;
+    int cost;
     int level;
     int v; // vertex number
     int **d;
-    struct node *parent;
     struct node *next;
     struct node *prev;
+    int **path;
 };
 struct list
 {
@@ -27,9 +27,9 @@ struct list
 /* function declaration */
 double GetTime(void);   // get current time from linux system 
 int Reduce(int **d); 
-struct node* newNode(int **ori_d, struct node *E, int R, int level, int i, int j);
+struct node* newNode(int **ori_d, int **path, int R, int level, int i, int j);
 void pad_impossible(int **d, int i, int j); 
-struct node* LCsearch(int **d);
+struct node* LCsearch(int **d, int **path);
 /* global variable declaration */
 int N;  // number of cities
 int **d;  // 2D distance array
@@ -49,19 +49,26 @@ int main(void)
     struct node *A;
     int **sol;
     int total_cost;
-
+    int **path;
     // read the first line to get N
     scanf("%d", &N);
     // memory allocation 
     name = (char**)malloc(N * sizeof(char*));
     d = (int**)malloc(N * sizeof(int*));
     sol = (int**)malloc(N * sizeof(int*));
+    path = (int**)malloc(N * sizeof(int*));
+
     for (i = 0; i < N; i++) {
         name[i] = (char*)malloc(string_len * sizeof(char));
         d[i] = (int*)malloc(N * sizeof(int));
         sol[i] = (int*)malloc(2 * sizeof(int));
+        path[i] = (int*)malloc(2 * sizeof(int));
     }
-    
+    for (i = 0; i < N; i++) {
+        for (j = 0; j < 2; j++) {
+            path[i][j] = 0;
+        }
+    }
     // read name of cities
     for (i = 0; i < N; i++) {
         getchar();  // remove "\n"
@@ -79,25 +86,28 @@ int main(void)
             }
         }
     }
-    // run LSBB
+    // run LCBB
     t = GetTime();
-    A = LCsearch(d);
+    A = LCsearch(d, path);
     t = GetTime() - t;
     // 
     total_cost = A->cost;
-    sol[N - 1][0] = A->v;
-    sol[N - 1][1] = 0;  // back to 0
-    i = N - 2;
-    while (A->parent) {
-        // sol: from sol[i][0] to sol[i][1]
-        sol[i][0] = A->parent->v;
-        sol[i][1] = A->v;
-        A = A->parent;
-        i--;
-    }
+    // sol[N - 1][0] = A->v;
+    // sol[N - 1][1] = 0;  // back to 0
+    A->path[N - 1][0] = A->v;
+    A->path[N - 1][1] = 0;  // back to 0
+    // i = N - 2;
+    // while (A->parent) {
+    //     // sol: from sol[i][0] to sol[i][1]
+    //     sol[i][0] = A->parent->v;
+    //     sol[i][1] = A->v;
+    //     A = A->parent;
+    //     i--;
+    // }
     printf("Minimum distance route:\n");
     for (i = 0; i < N; i++) {
-        printf("  %s -> %s\n", name[sol[i][0]], name[sol[i][1]]);
+        // printf("  %s -> %s\n", name[sol[i][0]], name[sol[i][1]]);
+        printf("  %s -> %s\n", name[A->path[i][0]], name[A->path[i][1]]);
     }
     printf("Total travelling distacne: %d\n", total_cost);
     printf("CPU time: %g s\n", t);
@@ -170,22 +180,37 @@ int Reduce(int **d)
 
 // from node i to node j
 // R is previous lb
-struct node* newNode(int **d, struct node *E, int R, int level, int i, int j)
+struct node* newNode(int **d, int **path,  int R, int level, int i, int j)
 {
     int k, l; // loop index
     struct node* newNode = malloc(sizeof(struct node));
     
     // initialize 
     newNode->cost = R;
-    newNode->parent = E;
     newNode->level = level;
     newNode->v = j;
     newNode->d = (int**)malloc(N * sizeof(int*));
     newNode->next = NULL;
     newNode->prev = NULL;
+    newNode->path = (int**)malloc(N * sizeof(int*));
 
     for (k = 0; k < N; k++) {
         newNode->d[k] = (int*)malloc(N * sizeof(int));
+    }
+    
+    for (k = 0; k < N; k++) {
+        newNode->path[k] = (int*)malloc(2 * sizeof(int));
+    }
+    // copy path for previous node
+    for (k = 0; k < level; k++) {
+        for (l = 0; l < 2; l++) {
+            newNode->path[k][l] = path[k][l];
+        }
+    }
+    // record new path
+    if (level > 0) {
+        newNode->path[level - 1][0] = i;
+        newNode->path[level - 1][1] = j;
     }
     // initialization: copy previous step d
     for (k = 0; k < N; k++) {
@@ -209,10 +234,11 @@ void pad_impossible(int **d, int i, int j)
     for (k = 0; k < N; k++) {
         d[k][j] = -1;
     }
-    d[j][i] = -1;
+    d[j][i] = -1;  // reverse link is not available 
+    d[j][0] = -1;  // current node j cannot directly back to starting city
 }
 
-struct node* LCsearch(int **d)
+struct node* LCsearch(int **d, int **path)
 {
     struct node *root, *child, *E, *temp, *min_node;
     int level;
@@ -224,7 +250,7 @@ struct node* LCsearch(int **d)
 
     // root node 
     R = Reduce(d);
-    root = newNode(d, NULL, R, 0, -1, 0);
+    root = newNode(d, path, R, 0, -1, 0);
     L->head = NULL;
     L->tail = NULL;
     E = root;
@@ -238,10 +264,11 @@ struct node* LCsearch(int **d)
         // select new edge <i, j>
         for (j = 1; j < N; j++) {
             if (E->d[i][j] >= 0) {
-                child = newNode(E->d, E, E->cost, E->level + 1, i, j);
+                child = newNode(E->d, E->path, E->cost, E->level + 1, i, j);
                 pad_impossible(child->d, i, j);
                 r = Reduce(child->d);            
                 child->cost = E->cost + E->d[i][j] + r;
+                // printf("%d, %d : %d\n", i, j, child->cost);
                 // initialize L
                 if (L->head == NULL && L->tail == NULL) {
                     L->head = child;
@@ -257,14 +284,14 @@ struct node* LCsearch(int **d)
             }
         }
         // Least
+        free(E);
         temp = L->head;
         min_node = NULL;
         min = inf;
         while (temp) {
             if (temp->cost < min) {
                 min = temp->cost;
-                min_node = temp;
-                
+                min_node = temp;                
             }
             temp = temp->next;
         }
