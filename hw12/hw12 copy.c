@@ -86,11 +86,10 @@ int main(void)
     t = GetTime();
     A = LCBB(d, path);
     t = GetTime() - t;
-    // retrieve solution in A
+
     total_cost = A->cost;
-    // finally back to the first city 
     A->path[N - 1][0] = A->v;
-    A->path[N - 1][1] = 0;  
+    A->path[N - 1][1] = 0;  // back to 0
     printf("Minimum distance route:\n");
     for (i = 0; i < N; i++) {
         printf("  %s -> %s\n", name[A->path[i][0]], name[A->path[i][1]]);
@@ -241,7 +240,7 @@ struct node* LCBB(int **d, int **path)
     struct list *L = (struct list*)malloc(sizeof(struct list));
     int min;
     int R;
-
+    int lb = inf; 
     // initialization: create root node 
     R = Reduce(d);
     root = newNode(d, path, R, 0, -1, 0);
